@@ -6,10 +6,10 @@ Performance test suite for the `ioss-intermediary-registration-frontend`, using 
 
 Start Mongo Docker container following instructions from the [MDTP Handbook](https://docs.tax.service.gov.uk/mdtp-handbook/documentation/developer-set-up/set-up-mongodb.html).
 
-Start `PLATFORM_TEST_EXAMPLE_UI_JOURNEY_TESTS` services as follows:
+Start `IMPORT_ONE_STOP_SHOP_ALL` services as follows:
 
 ```bash
-sm2 --start PLATFORM_TEST_EXAMPLE_UI_JOURNEY_TESTS
+sm2 --start IMPORT_ONE_STOP_SHOP_ALL
 ```
 
 ### Logging
