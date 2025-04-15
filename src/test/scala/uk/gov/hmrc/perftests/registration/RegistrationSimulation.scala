@@ -22,7 +22,14 @@ import uk.gov.hmrc.perftests.registration.RegistrationRequests._
 class RegistrationSimulation extends PerformanceTestRunner {
 
   setup("registration", "IOSS Intermediary Registration Journey") withRequests
-    navigateToHomePage
+    (
+      getIOSSIntermediaryRegistered,
+      postIOSSIntermediaryRegistered,
+      getRegisteredForVatInUk,
+      postRegisteredForVatInUk,
+      getNiOrEuBased,
+      postNiOrEuBased
+    )
 
   runSimulation()
 }
