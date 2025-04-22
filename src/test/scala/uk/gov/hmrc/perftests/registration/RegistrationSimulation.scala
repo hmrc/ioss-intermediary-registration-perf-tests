@@ -30,7 +30,12 @@ class RegistrationSimulation extends PerformanceTestRunner {
       getRegisteredForVatInUk,
       postRegisteredForVatInUk,
       getNiOrEuBased,
-      postNiOrEuBased
+      postNiOrEuBased,
+      getRegisterToUseService,
+      postRegisterToUseService,
+      resumeJourney,
+      getConfirmVatDetails,
+      postConfirmVatDetails
 //      requires extra pages once dev is complete
 //      trading names requires manual tweak in frontend so commenting out until vat info is ready
 //      getHaveUkTradingName,

@@ -95,6 +95,39 @@ object RegistrationRequests extends ServicesConfiguration {
       .check(status.in(303))
       .check(header("Location").is(s"$route/register-to-use-service"))
 
+  def getRegisterToUseService =
+    http("Get Register To Use Service page")
+      .get(s"$baseUrl$route/register-to-use-service")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def postRegisterToUseService =
+    http("Post Register To Use Service page")
+      .post(s"$baseUrl$route/register-to-use-service")
+      .formParam("csrfToken", "${csrfToken}")
+      .formParam("value", true)
+      .check(status.in(303))
+      .check(header("Location").is(s"$route/on-sign-in"))
+
+  def resumeJourney =
+    http("Resume journey")
+      .get(s"$baseUrl$route/on-sign-in")
+      .check(status.in(303))
+
+  def getConfirmVatDetails =
+    http("Get Confirm VAT Details page")
+      .get(s"$baseUrl$route/confirm-vat-details")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def postConfirmVatDetails =
+    http("Post Confirm VAT Details page")
+      .post(s"$baseUrl$route/confirm-vat-details")
+      .formParam("csrfToken", "${csrfToken}")
+      .formParam("value", "Yes")
+      .check(status.in(303))
+      .check(header("Location").is(s"$route/have-uk-trading-name"))
+
   // add register-to-use-service
   // add vat info
 
