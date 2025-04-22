@@ -26,7 +26,32 @@ object RegistrationRequests extends ServicesConfiguration {
   val baseUrl: String = baseUrlFor("ioss-intermediary-registration-frontend")
   val route: String   = "/intermediary-ioss"
 
+  val loginUrl = baseUrlFor("auth-login-stub")
+
   def inputSelectorByName(name: String): Expression[String] = s"input[name='$name']"
+
+  def getAuthorityWizard =
+    http("Get Authority Wizard page")
+      .get(loginUrl + s"/auth-login-stub/gg-sign-in")
+      .check(status.in(200, 303))
+
+  def postAuthorityWizard =
+    http("Enter Auth login credentials ")
+      .post(loginUrl + s"/auth-login-stub/gg-sign-in")
+      .formParam("authorityId", "")
+      .formParam("gatewayToken", "")
+      .formParam("credentialStrength", "strong")
+      .formParam("confidenceLevel", "50")
+      .formParam("affinityGroup", "Organisation")
+      .formParam("email", "user@test.com")
+      .formParam("credentialRole", "User")
+      .formParam("redirectionUrl", baseUrl + route)
+      .formParam("enrolment[0].name", "HMRC-MTD-VAT")
+      .formParam("enrolment[0].taxIdentifier[0].name", "VRN")
+      .formParam("enrolment[0].taxIdentifier[0].value", "100000001")
+      .formParam("enrolment[0].state", "Activated")
+      .check(status.in(200, 303))
+      .check(headerRegex("Set-Cookie", """mdtp=(.*)""").saveAs("mdtpCookie"))
 
   def getIOSSIntermediaryRegistered =
     http("Get IOSS Intermediary Registered page")
@@ -69,5 +94,60 @@ object RegistrationRequests extends ServicesConfiguration {
       .formParam("value", true)
       .check(status.in(303))
       .check(header("Location").is(s"$route/register-to-use-service"))
+
+  // add register-to-use-service
+  // add vat info
+
+  def getHaveUkTradingName =
+    http("Get Have UK Trading Name page")
+      .get(s"$baseUrl$route/have-uk-trading-name")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def postHaveUkTradingName =
+    http("Post Have UK Trading Name page")
+      .post(s"$baseUrl$route/have-uk-trading-name")
+      .formParam("csrfToken", "${csrfToken}")
+      .formParam("value", true)
+      .check(status.in(303))
+      .check(header("Location").is(s"$route/uk-trading-name/1"))
+
+  def getUkTradingName(index: Int) =
+    http("Get UK Trading Name page")
+      .get(s"$baseUrl$route/uk-trading-name/$index")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def postUkTradingName(index: Int, tradingName: String) =
+    http("Post UK Trading Name page")
+      .post(s"$baseUrl$route/uk-trading-name/$index")
+      .formParam("csrfToken", "${csrfToken}")
+      .formParam("value", tradingName)
+      .check(status.in(303))
+      .check(header("Location").is(s"$route/add-uk-trading-name"))
+
+  def getAddTradingName =
+    http("Get Add Trading Name page")
+      .get(s"$baseUrl$route/add-uk-trading-name")
+      .header("Cookie", "mdtp=${mdtpCookie}")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def testAddTradingName(answer: Boolean) =
+    http("Add Trading Name")
+      .post(s"$baseUrl$route/add-uk-trading-name")
+      .formParam("csrfToken", "${csrfToken}")
+      .formParam("value", answer)
+      .check(status.in(200, 303))
+
+  def postAddTradingName(answer: Boolean, index: Option[Int]) =
+    if (answer) {
+      testAddTradingName(answer)
+        .check(header("Location").is(s"$route/uk-trading-name/${index.get}"))
+    } else {
+      testAddTradingName(answer)
+      //      not developed yet
+//        .check(header("Location").is(s"$route/previous-oss"))
+    }
 
 }
