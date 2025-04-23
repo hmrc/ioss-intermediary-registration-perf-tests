@@ -30,19 +30,22 @@ class RegistrationSimulation extends PerformanceTestRunner {
       getRegisteredForVatInUk,
       postRegisteredForVatInUk,
       getNiOrEuBased,
-      postNiOrEuBased
-//      requires extra pages once dev is complete
-//      trading names requires manual tweak in frontend so commenting out until vat info is ready
-//      getHaveUkTradingName,
-//      postHaveUkTradingName,
-//      getUkTradingName(1),
-//      postUkTradingName(1, "trading name"),
-//      getAddTradingName,
-//      postAddTradingName(true, Some(2)),
-//      getUkTradingName(2),
-//      postUkTradingName(2, "2nd trading name"),
-//      getAddTradingName,
-//      postAddTradingName(false, None)
+      postNiOrEuBased,
+      getRegisterToUseService,
+      postRegisterToUseService,
+      resumeJourney,
+      getConfirmVatDetails,
+      postConfirmVatDetails,
+      getHaveUkTradingName,
+      postHaveUkTradingName,
+      getUkTradingName(1),
+      postUkTradingName(1, "trading name"),
+      getAddTradingName,
+      postAddTradingName(true, Some(2)),
+      getUkTradingName(2),
+      postUkTradingName(2, "2nd trading name"),
+      getAddTradingName,
+      postAddTradingName(false, None)
     )
 
   runSimulation()
