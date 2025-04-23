@@ -124,12 +124,9 @@ object RegistrationRequests extends ServicesConfiguration {
     http("Post Confirm VAT Details page")
       .post(s"$baseUrl$route/confirm-vat-details")
       .formParam("csrfToken", "${csrfToken}")
-      .formParam("value", "Yes")
+      .formParam("value", "yes")
       .check(status.in(303))
       .check(header("Location").is(s"$route/have-uk-trading-name"))
-
-  // add register-to-use-service
-  // add vat info
 
   def getHaveUkTradingName =
     http("Get Have UK Trading Name page")
