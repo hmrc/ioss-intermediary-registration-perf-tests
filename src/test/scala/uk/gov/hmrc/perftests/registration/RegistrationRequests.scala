@@ -330,8 +330,7 @@ object RegistrationRequests extends ServicesConfiguration {
         .check(header("Location").is(s"$route/eu-tax/${index.get}"))
     } else {
       testAddTaxDetails(answer)
-//        Not implemented yet
-//        .check(header("Location").is(s"$route/website-address/${index.get}"))
+        .check(header("Location").is(s"$route/contact-details"))
     }
 
   def getEuTaxReference(index: Int) =
@@ -348,5 +347,23 @@ object RegistrationRequests extends ServicesConfiguration {
       .formParam("value", taxReference)
       .check(status.in(200, 303))
       .check(header("Location").is(s"$route/eu-trading-name/$index"))
+
+  def getContactDetails =
+    http("Get Contact Details page")
+      .get(s"$baseUrl$route/contact-details")
+      .header("Cookie", "mdtp=${mdtpCookie}")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def postContactDetails =
+    http("Enter Contact Details")
+      .post(s"$baseUrl$route/contact-details")
+      .formParam("csrfToken", "${csrfToken}")
+      .formParam("fullName", "Trader Name")
+      .formParam("telephoneNumber", "012301230123")
+      .formParam("emailAddress", "trader@testemail.com")
+      .check(status.in(200, 303))
+//       next page not developed yet
+//      .check(header("Location").is(s"$route/bank-account-details"))
 
 }

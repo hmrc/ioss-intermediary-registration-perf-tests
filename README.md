@@ -55,9 +55,6 @@ sbt scalafmtSbt
 ```
 
 Format all project files as follows:
-
-```bash
-sbt scalafmtAll
 ```
 
 ## License
