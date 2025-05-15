@@ -79,7 +79,9 @@ class RegistrationSimulation extends PerformanceTestRunner {
       getCheckTaxDetails(2),
       postCheckTaxDetails(2),
       getAddTaxDetails,
-      postAddTaxDetails(false, Some(1))
+      postAddTaxDetails(false, Some(1)),
+      getContactDetails,
+      postContactDetails
     )
 
   runSimulation()
