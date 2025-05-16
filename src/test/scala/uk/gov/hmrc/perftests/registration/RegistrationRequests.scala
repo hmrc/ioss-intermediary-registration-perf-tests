@@ -363,7 +363,24 @@ object RegistrationRequests extends ServicesConfiguration {
       .formParam("telephoneNumber", "012301230123")
       .formParam("emailAddress", "trader@testemail.com")
       .check(status.in(200, 303))
+
+  def getBankAccountDetails =
+    http("Get Bank Details page")
+      .get(s"$baseUrl$route/bank-account-details")
+      .header("Cookie", "mdtp=${mdtpCookie}")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def postBankAccountDetails =
+    http("Enter Bank Details")
+      .post(s"$baseUrl$route/bank-account-details")
+      .formParam("csrfToken", "${csrfToken}")
+      .formParam("accountName", "Accountname")
+      .formParam("bic", "SMCOGB2LXXM")
+      .formParam("iban", "GB29NWBK60161331926819")
+      .check(status.in(303))
+      .check(header("Location").is(s"$route/there-is-a-problem"))
+//      there  is problem with this url the page as next page is not developed
 //       next page not developed yet
-//      .check(header("Location").is(s"$route/bank-account-details"))
 
 }
