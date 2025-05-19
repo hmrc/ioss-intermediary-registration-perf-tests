@@ -383,4 +383,26 @@ object RegistrationRequests extends ServicesConfiguration {
 //      there  is problem with this url the page as next page is not developed
 //       next page not developed yet
 
+  def getCheckYourAnswers =
+    http("Get Check Your Answers page")
+      .get(s"$baseUrl$route/check-your-answers")
+      .header("Cookie", "mdtp=${mdtpCookie}")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def postCheckYourAnswers =
+    http("Post Check Your Answers page")
+//      Incomplete checks to be developed in a subsequent ticket
+//      .post(s"$baseUrl$route/check-your-answers/false")
+      .post(s"$baseUrl$route/check-your-answers")
+      .formParam("csrfToken", "${csrfToken}")
+      .check(status.in(200, 303))
+      .check(header("Location").is(s"$route/successful"))
+
+  def getRegistrationSuccessful =
+    http("Get Registration Successful page")
+      .get(s"$baseUrl$route/successful")
+      .header("Cookie", "mdtp=${mdtpCookie}")
+      .check(status.in(200))
+
 }
