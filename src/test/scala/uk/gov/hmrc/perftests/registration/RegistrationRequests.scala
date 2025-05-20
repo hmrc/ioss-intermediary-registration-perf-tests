@@ -379,9 +379,7 @@ object RegistrationRequests extends ServicesConfiguration {
       .formParam("bic", "SMCOGB2LXXM")
       .formParam("iban", "GB29NWBK60161331926819")
       .check(status.in(303))
-      .check(header("Location").is(s"$route/there-is-a-problem"))
-//      there  is problem with this url the page as next page is not developed
-//       next page not developed yet
+      .check(header("Location").is(s"$route/check-your-answers"))
 
   def getCheckYourAnswers =
     http("Get Check Your Answers page")
