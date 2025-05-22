@@ -24,6 +24,9 @@ Do **NOT** run a full performance test against staging from your local machine. 
 
 Run smoke test (locally) as follows:
 
+Note: to run locally, you will need to run the frontend service locally with email-verification-enabled in application.conf set to false.
+This will be set to false in staging by default.
+
 ```bash
 sbt -Dperftest.runSmokeTest=true -DrunLocal=true gatling:test
 ```
