@@ -432,6 +432,7 @@ object RegistrationRequests extends ServicesConfiguration {
       .formParam("telephoneNumber", "012301230123")
       .formParam("emailAddress", "trader@testemail.com")
       .check(status.in(200, 303))
+      .check(header("Location").is(s"$route/bank-account-details"))
 
   def getBankAccountDetails =
     http("Get Bank Details page")
