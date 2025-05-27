@@ -176,8 +176,77 @@ object RegistrationRequests extends ServicesConfiguration {
         .check(header("Location").is(s"$route/uk-trading-name/${index.get}"))
     } else {
       testAddTradingName(answer)
-      //      not developed yet
-//        .check(header("Location").is(s"$route/previous-oss"))
+        .check(header("Location").is(s"$route/has-previously-registered-as-intermediary"))
+    }
+
+  def getHasPreviouslyRegisteredAsIntermediary =
+    http("Get Has Previously Registered As Intermediary page")
+      .get(s"$baseUrl$route/has-previously-registered-as-intermediary")
+      .header("Cookie", "mdtp=${mdtpCookie}")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def postHasPreviouslyRegisteredAsIntermediary(index: Int) =
+    http("Answer Has Previously Registered As Intermediary page")
+      .post(s"$baseUrl$route/has-previously-registered-as-intermediary")
+      .formParam("csrfToken", "${csrfToken}")
+      .formParam("value", "true")
+      .check(status.in(200, 303))
+      .check(header("Location").is(s"$route/previous-eu-country/$index"))
+
+  def getPreviousEuCountry(index: Int) =
+    http("Get Previous EU Country page")
+      .get(s"$baseUrl$route/previous-eu-country/$index")
+      .header("Cookie", "mdtp=${mdtpCookie}")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def postPreviousEuCountry(countryIndex: Int, countryCode: String) =
+    http("Enter Previous EU Country")
+      .post(s"$baseUrl$route/previous-eu-country/$countryIndex")
+      .formParam("csrfToken", "${csrfToken}")
+      .formParam("value", countryCode)
+      .check(status.in(200, 303))
+      .check(header("Location").is(s"$route/previous-intermediary-registration-number/$countryIndex"))
+
+  def getPreviousIntermediaryRegistrationNumber(countryIndex: Int) =
+    http("Get Previous Intermediary Registration Number page")
+      .get(s"$baseUrl$route/previous-intermediary-registration-number/$countryIndex")
+      .header("Cookie", "mdtp=${mdtpCookie}")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def postPreviousIntermediaryRegistrationNumber(countryIndex: Int, registrationNumber: String) =
+    http("Enter Previous Intermediary Registration Number ")
+      .post(s"$baseUrl$route/previous-intermediary-registration-number/$countryIndex")
+      .formParam("csrfToken", "${csrfToken}")
+      .formParam("value", registrationNumber)
+      .check(status.in(200, 303))
+      .check(header("Location").is(s"$route/add-previous-intermediary-registration"))
+
+  def getAddPreviousIntermediaryRegistration =
+    http("Get Add Previous Intermediary Registration page")
+      .get(s"$baseUrl$route/add-previous-intermediary-registration")
+      .header("Cookie", "mdtp=${mdtpCookie}")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def testAddPreviousIntermediaryRegistration(answer: Boolean) =
+    http("Add Previous Intermediary Registration")
+      .post(s"$baseUrl$route/add-previous-intermediary-registration")
+//      Completion checks still being developed
+//      .post(s"$baseUrl$route/add-previous-intermediary-registration?incompletePromptShown=false")
+      .formParam("csrfToken", "${csrfToken}")
+      .formParam("value", answer)
+      .check(status.in(200, 303))
+
+  def postAddPreviousIntermediaryRegistration(answer: Boolean, index: Option[Int]) =
+    if (answer) {
+      testAddPreviousIntermediaryRegistration(answer)
+        .check(header("Location").is(s"$route/previous-eu-country/${index.get}"))
+    } else {
+      testAddPreviousIntermediaryRegistration(answer)
+        .check(header("Location").is(s"$route/tax-in-eu"))
     }
 
   def getIsTaxRegisteredInEu =
