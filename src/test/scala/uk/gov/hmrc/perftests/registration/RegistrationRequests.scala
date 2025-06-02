@@ -233,9 +233,7 @@ object RegistrationRequests extends ServicesConfiguration {
 
   def testAddPreviousIntermediaryRegistration(answer: Boolean) =
     http("Add Previous Intermediary Registration")
-      .post(s"$baseUrl$route/add-previous-intermediary-registration")
-//      Completion checks still being developed
-//      .post(s"$baseUrl$route/add-previous-intermediary-registration?incompletePromptShown=false")
+      .post(s"$baseUrl$route/add-previous-intermediary-registration?incompletePromptShown=false")
       .formParam("csrfToken", "${csrfToken}")
       .formParam("value", answer)
       .check(status.in(200, 303))
@@ -460,9 +458,7 @@ object RegistrationRequests extends ServicesConfiguration {
 
   def postCheckYourAnswers =
     http("Post Check Your Answers page")
-//      Incomplete checks to be developed in a subsequent ticket
-//      .post(s"$baseUrl$route/check-your-answers/false")
-      .post(s"$baseUrl$route/check-your-answers")
+      .post(s"$baseUrl$route/check-your-answers/false?waypoints=check-your-answers")
       .formParam("csrfToken", "${csrfToken}")
       .check(status.in(200, 303))
       .check(header("Location").is(s"$route/successful"))
