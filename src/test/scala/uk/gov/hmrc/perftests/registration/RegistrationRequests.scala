@@ -244,7 +244,7 @@ object RegistrationRequests extends ServicesConfiguration {
         .check(header("Location").is(s"$route/previous-eu-country/${index.get}"))
     } else {
       testAddPreviousIntermediaryRegistration(answer)
-        .check(header("Location").is(s"$route/tax-in-eu"))
+        .check(header("Location").is(s"$route/eu-fixed-establishment"))
     }
 
   def getEuFixedEstablishment =
