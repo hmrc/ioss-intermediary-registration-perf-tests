@@ -244,51 +244,55 @@ object RegistrationRequests extends ServicesConfiguration {
         .check(header("Location").is(s"$route/previous-eu-country/${index.get}"))
     } else {
       testAddPreviousIntermediaryRegistration(answer)
-        .check(header("Location").is(s"$route/tax-in-eu"))
+        .check(header("Location").is(s"$route/eu-fixed-establishment"))
     }
 
-  def getIsTaxRegisteredInEu =
-    http("Get Is Tax Registered in EU page")
-      .get(s"$baseUrl$route/tax-in-eu")
+  def getEuFixedEstablishment =
+    http("Get Eu Fixed Establishment page")
+      .get(s"$baseUrl$route/eu-fixed-establishment")
       .header("Cookie", "mdtp=${mdtpCookie}")
       .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
       .check(status.in(200))
 
-  def postIsTaxRegisteredInEu(index: Int) =
-    http("Answer Is Tax Registered in EU")
-      .post(s"$baseUrl$route/tax-in-eu")
+  def postEuFixedEstablishment(index: Int) =
+    http("Answer Eu Fixed Establishment")
+      .post(s"$baseUrl$route/eu-fixed-establishment")
       .formParam("csrfToken", "${csrfToken}")
       .formParam("value", "true")
       .check(status.in(200, 303))
       .check(header("Location").is(s"$route/eu-tax/$index"))
 
-  def getVatRegisteredInEuMemberState(index: Int) =
-    http("Get Tax Registered in EU Member State page")
+  def getVatRegisteredEuCountry(index: Int) =
+    http("Get Vat Registered Eu Country page")
       .get(s"$baseUrl$route/eu-tax/$index")
       .header("Cookie", "mdtp=${mdtpCookie}")
       .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
       .check(status.in(200))
 
-  def postVatRegisteredInEuMemberState(index: Int, countryCode: String) =
-    http("Enter Tax Registered in EU Member State")
+  def postVatRegisteredEuCountry(index: Int, countryCode: String) =
+    http("Enter Vat Registered Eu Country State")
       .post(s"$baseUrl$route/eu-tax/$index")
       .formParam("csrfToken", "${csrfToken}")
       .formParam("value", countryCode)
       .check(status.in(200, 303))
-      .check(header("Location").is(s"$route/eu-fixed-establishment/$index"))
+      .check(header("Location").is(s"$route/eu-fixed-establishment-address/$index"))
 
-  def getHowDoYouOperate(index: Int) =
-    http("Get How Do You Operate page")
-      .get(s"$baseUrl$route/eu-fixed-establishment/$index")
+  def getTradingNameBusinessAddress(index: Int) =
+    http("Get Trading Name Business Address page")
+      .get(s"$baseUrl$route/eu-fixed-establishment-address/$index")
       .header("Cookie", "mdtp=${mdtpCookie}")
       .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
       .check(status.in(200))
 
-  def postHowDoYouOperate(index: Int) =
-    http("Answer How Do You Operate Page")
-      .post(s"$baseUrl$route/eu-fixed-establishment/$index")
+  def postTradingNameBusinessAddress(index: Int) =
+    http("Enter Trading Name Business Address")
+      .post(s"$baseUrl$route/eu-fixed-establishment-address/$index")
       .formParam("csrfToken", "${csrfToken}")
-      .formParam("value", true)
+      .formParam("tradingName", "Trading Name")
+      .formParam("line1", "1 Street Name")
+      .formParam("line2", "Suburb")
+      .formParam("townOrCity", "City")
+      .formParam("postCode", "ABC123")
       .check(status.in(200, 303))
       .check(header("Location").is(s"$route/registration-tax-type/$index"))
 
@@ -328,38 +332,20 @@ object RegistrationRequests extends ServicesConfiguration {
       .formParam("csrfToken", "${csrfToken}")
       .formParam("value", euVatNumber)
       .check(status.in(200, 303))
-      .check(header("Location").is(s"$route/eu-trading-name/$index"))
+      .check(header("Location").is(s"$route/check-tax-details/$index"))
 
-  def getFixedEuTradingName(index: Int) =
-    http("Get Fixed Establishment Trading Name page")
-      .get(s"$baseUrl$route/eu-trading-name/$index")
+  def getEuTaxReference(index: Int) =
+    http("Get EU Tax Reference page")
+      .get(s"$baseUrl$route/eu-tax-identification-number/$index")
       .header("Cookie", "mdtp=${mdtpCookie}")
       .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
       .check(status.in(200))
 
-  def postFixedEuTradingName(index: Int, tradingName: String) =
-    http("Enter Fixed Eu Trading Name")
-      .post(s"$baseUrl$route/eu-trading-name/$index")
+  def postEuTaxReference(index: Int, taxReference: String) =
+    http("Enter EU Tax Reference")
+      .post(s"$baseUrl$route/eu-tax-identification-number/$index")
       .formParam("csrfToken", "${csrfToken}")
-      .formParam("value", tradingName)
-      .check(status.in(200, 303))
-      .check(header("Location").is(s"$route/eu-fixed-establishment-address/$index"))
-
-  def getFixedEstablishmentAddress(index: Int) =
-    http("Get Fixed Establishment Address page")
-      .get(s"$baseUrl$route/eu-fixed-establishment-address/$index")
-      .header("Cookie", "mdtp=${mdtpCookie}")
-      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
-      .check(status.in(200))
-
-  def postFixedEstablishmentAddress(index: Int) =
-    http("Enter Fixed Establishment Address")
-      .post(s"$baseUrl$route/eu-fixed-establishment-address/$index")
-      .formParam("csrfToken", "${csrfToken}")
-      .formParam("line1", "line1")
-      .formParam("line2", "line2")
-      .formParam("townOrCity", "townOrCity")
-      .formParam("postCode", "ABC")
+      .formParam("value", taxReference)
       .check(status.in(200, 303))
       .check(header("Location").is(s"$route/check-tax-details/$index"))
 
@@ -399,21 +385,6 @@ object RegistrationRequests extends ServicesConfiguration {
       testAddTaxDetails(answer)
         .check(header("Location").is(s"$route/contact-details"))
     }
-
-  def getEuTaxReference(index: Int) =
-    http("Get EU Tax Reference page")
-      .get(s"$baseUrl$route/eu-tax-identification-number/$index")
-      .header("Cookie", "mdtp=${mdtpCookie}")
-      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
-      .check(status.in(200))
-
-  def postEuTaxReference(index: Int, taxReference: String) =
-    http("Enter EU Tax Reference")
-      .post(s"$baseUrl$route/eu-tax-identification-number/$index")
-      .formParam("csrfToken", "${csrfToken}")
-      .formParam("value", taxReference)
-      .check(status.in(200, 303))
-      .check(header("Location").is(s"$route/eu-trading-name/$index"))
 
   def getContactDetails =
     http("Get Contact Details page")
