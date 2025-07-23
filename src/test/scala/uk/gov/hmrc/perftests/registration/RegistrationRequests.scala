@@ -24,7 +24,7 @@ import uk.gov.hmrc.performance.conf.ServicesConfiguration
 object RegistrationRequests extends ServicesConfiguration {
 
   val baseUrl: String = baseUrlFor("ioss-intermediary-registration-frontend")
-  val route: String   = "/intermediary-ioss"
+  val route: String   = "/pay-clients-vat-on-eu-sales/register-import-one-stop-shop-intermediary"
 
   val loginUrl = baseUrlFor("auth-login-stub")
 
