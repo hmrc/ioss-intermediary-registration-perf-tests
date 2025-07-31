@@ -95,5 +95,12 @@ class RegistrationSimulation extends PerformanceTestRunner {
       getRegistrationSuccessful
     )
 
+  setup("amendRegistration", "IOSS Intermediary Amend Registration Journey") withRequests
+    (
+      getAuthorityWizard,
+      postAuthorityWizardAmend,
+      getChangeYourRegistration
+    )
+
   runSimulation()
 }
