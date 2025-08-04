@@ -53,6 +53,28 @@ object RegistrationRequests extends ServicesConfiguration {
       .check(status.in(200, 303))
       .check(headerRegex("Set-Cookie", """mdtp=(.*)""").saveAs("mdtpCookie"))
 
+  def postAuthorityWizardAmend =
+    http("Enter Auth login credentials ")
+      .post(loginUrl + s"/auth-login-stub/gg-sign-in")
+      .formParam("authorityId", "")
+      .formParam("gatewayToken", "")
+      .formParam("credentialStrength", "strong")
+      .formParam("confidenceLevel", "50")
+      .formParam("affinityGroup", "Organisation")
+      .formParam("email", "user@test.com")
+      .formParam("credentialRole", "User")
+      .formParam("redirectionUrl", s"$baseUrl$route/start-amend-journey")
+      .formParam("enrolment[0].name", "HMRC-MTD-VAT")
+      .formParam("enrolment[0].taxIdentifier[0].name", "VRN")
+      .formParam("enrolment[0].taxIdentifier[0].value", "100000001")
+      .formParam("enrolment[0].state", "Activated")
+      .formParam("enrolment[1].name", "HMRC-IOSS-INT")
+      .formParam("enrolment[1].taxIdentifier[0].name", "IntNumber")
+      .formParam("enrolment[1].taxIdentifier[0].value", "IN9001234567")
+      .formParam("enrolment[1].state", "Activated")
+      .check(status.in(200, 303))
+      .check(headerRegex("Set-Cookie", """mdtp=(.*)""").saveAs("mdtpCookie"))
+
   def getIOSSIntermediaryRegistered =
     http("Get IOSS Intermediary Registered page")
       .get(s"$baseUrl$route/ioss-intermediary-registered")
@@ -438,6 +460,12 @@ object RegistrationRequests extends ServicesConfiguration {
     http("Get Registration Successful page")
       .get(s"$baseUrl$route/successful")
       .header("Cookie", "mdtp=#{mdtpCookie}")
+      .check(status.in(200))
+
+  def getChangeYourRegistration =
+    http("Get Change Your Registration page")
+      .get(s"$baseUrl$route/change-your-registration")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
       .check(status.in(200))
 
 }
