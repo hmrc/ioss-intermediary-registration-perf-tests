@@ -58,6 +58,7 @@ object RegistrationRequests extends ServicesConfiguration {
   def postAuthorityWizardAmend =
     http("Enter Auth login credentials ")
       .post(loginUrl + s"/auth-login-stub/gg-sign-in")
+      .formParam("csrfToken", "#{csrfToken}")
       .formParam("authorityId", "")
       .formParam("gatewayToken", "")
       .formParam("credentialStrength", "strong")
