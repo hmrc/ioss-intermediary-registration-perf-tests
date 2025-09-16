@@ -73,7 +73,7 @@ object RegistrationRequests extends ServicesConfiguration {
       .formParam("enrolment[0].state", "Activated")
       .formParam("enrolment[1].name", "HMRC-IOSS-INT")
       .formParam("enrolment[1].taxIdentifier[0].name", "IntNumber")
-      .formParam("enrolment[1].taxIdentifier[0].value", "IN9001234567")
+      .formParam("enrolment[1].taxIdentifier[0].value", "IN9001234568")
       .formParam("enrolment[1].state", "Activated")
       .check(status.in(200, 303))
       .check(headerRegex("Set-Cookie", """mdtp=(.*)""").saveAs("mdtpCookie"))
@@ -465,10 +465,69 @@ object RegistrationRequests extends ServicesConfiguration {
       .header("Cookie", "mdtp=#{mdtpCookie}")
       .check(status.in(200))
 
+  def getAmendJourney =
+    http("Get Amend Registration Journey")
+      .get(s"$baseUrl$route/start-amend-journey")
+      .check(status.in(303))
+      .check(header("Location").is(s"$route/change-your-registration"))
+
+  def getAmendAddTradingName =
+    http("Get Amend Add Trading Name page")
+      .get(s"$baseUrl$route/add-uk-trading-name?waypoints=change-your-registration")
+      .header("Cookie", "mdtp=#{mdtpCookie}")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def testAmendAddTradingName(answer: Boolean) =
+    http("Add Trading Name")
+      .post(s"$baseUrl$route/add-uk-trading-name?waypoints=change-your-registration")
+      .formParam("csrfToken", "#{csrfToken}")
+      .formParam("value", answer)
+      .check(status.in(200, 303))
+
+  def postAmendAddTradingName(answer: Boolean) =
+    if (answer) {
+      testAmendAddTradingName(answer)
+        .check(
+          header("Location").is(s"$route/uk-trading-name/3?waypoints=add-uk-trading-name%2Cchange-your-registration")
+        )
+    } else {
+      testAmendAddTradingName(answer)
+        .check(header("Location").is(s"$route/change-your-registration"))
+    }
+
+  def getAmendTradingName(index: Int) =
+    http("Get Trading Name page")
+      .get(s"$baseUrl$route/uk-trading-name/3?waypoints=change-add-uk-trading-name%2Cchange-your-registration")
+      .header("Cookie", "mdtp=#{mdtpCookie}")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def postAmendTradingName(index: Int, tradingName: String) =
+    http("Enter Trading Name")
+      .post(s"$baseUrl$route/uk-trading-name/3?waypoints=change-add-uk-trading-name%2Cchange-your-registration")
+      .formParam("csrfToken", "#{csrfToken}")
+      .formParam("value", tradingName)
+      .check(status.in(200, 303))
+      .check(header("Location").is(s"$route/add-uk-trading-name?waypoints=change-your-registration"))
+
   def getChangeYourRegistration =
     http("Get Change Your Registration page")
       .get(s"$baseUrl$route/change-your-registration")
       .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def postChangeYourRegistration =
+    http("Post Change Your Registration page")
+      .post(s"$baseUrl$route/change-your-registration?incompletePrompt=false")
+      .formParam("csrfToken", "#{csrfToken}")
+      .check(status.in(200, 303))
+      .check(header("Location").is(s"$route/successful-amend"))
+
+  def getSuccessfulAmend =
+    http("Get Successful Amend page")
+      .get(s"$baseUrl$route/successful-amend")
+      .header("Cookie", "mdtp=#{mdtpCookie}")
       .check(status.in(200))
 
 }

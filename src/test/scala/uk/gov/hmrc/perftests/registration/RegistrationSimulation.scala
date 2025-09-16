@@ -99,7 +99,16 @@ class RegistrationSimulation extends PerformanceTestRunner {
     (
       getAuthorityWizard,
       postAuthorityWizardAmend,
-      getChangeYourRegistration
+      getAmendJourney,
+      getAmendAddTradingName,
+      postAmendAddTradingName(true),
+      getAmendTradingName(3),
+      postAmendTradingName(3, "3rd trading name amend"),
+      getAmendAddTradingName,
+      postAmendAddTradingName(false),
+      getChangeYourRegistration,
+      postChangeYourRegistration,
+      getSuccessfulAmend
     )
 
   runSimulation()
