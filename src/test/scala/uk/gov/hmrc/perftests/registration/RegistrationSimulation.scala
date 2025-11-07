@@ -98,7 +98,7 @@ class RegistrationSimulation extends PerformanceTestRunner {
   setup("amendRegistration", "IOSS Intermediary Amend Registration Journey") withRequests
     (
       getAuthorityWizard,
-      postAuthorityWizardAmend,
+      postAuthorityWizardIntNumber("IN9001234568", "start-amend-journey"),
       getAmendJourney,
       getAmendAddTradingName,
       postAmendAddTradingName(true),
@@ -109,6 +109,22 @@ class RegistrationSimulation extends PerformanceTestRunner {
       getChangeYourRegistration,
       postChangeYourRegistration,
       getSuccessfulAmend
+    )
+
+  setup("rejoinRegistration", "IOSS Intermediary Rejoin Registration Journey") withRequests
+    (
+      getAuthorityWizard,
+      postAuthorityWizardIntNumber("IN9001113232", "start-amend-journey"),
+      getRejoinJourney,
+      getRejoinAddTradingName,
+      postRejoinAddTradingName(true),
+      getRejoinTradingName(3),
+      postRejoinTradingName(3, "3rd trading name rejoin"),
+      getRejoinAddTradingName,
+      postRejoinAddTradingName(false),
+      getRejoinCheckYourDetails,
+      postRejoinCheckYourDetails,
+      getSuccessfulRejoin
     )
 
   runSimulation()
