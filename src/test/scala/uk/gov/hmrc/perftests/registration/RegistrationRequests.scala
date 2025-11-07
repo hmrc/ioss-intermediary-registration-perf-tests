@@ -55,7 +55,7 @@ object RegistrationRequests extends ServicesConfiguration {
       .check(status.in(200, 303))
       .check(headerRegex("Set-Cookie", """mdtp=(.*)""").saveAs("mdtpCookie"))
 
-  def postAuthorityWizardAmend =
+  def postAuthorityWizardIntNumber(intNumber: String, redirectUrl: String) =
     http("Enter Auth login credentials ")
       .post(loginUrl + s"/auth-login-stub/gg-sign-in")
       .formParam("csrfToken", "#{csrfToken}")
@@ -66,14 +66,14 @@ object RegistrationRequests extends ServicesConfiguration {
       .formParam("affinityGroup", "Organisation")
       .formParam("email", "user@test.com")
       .formParam("credentialRole", "User")
-      .formParam("redirectionUrl", s"$baseUrl$route/start-amend-journey")
+      .formParam("redirectionUrl", s"$baseUrl$route/$redirectUrl")
       .formParam("enrolment[0].name", "HMRC-MTD-VAT")
       .formParam("enrolment[0].taxIdentifier[0].name", "VRN")
       .formParam("enrolment[0].taxIdentifier[0].value", "100000001")
       .formParam("enrolment[0].state", "Activated")
       .formParam("enrolment[1].name", "HMRC-IOSS-INT")
       .formParam("enrolment[1].taxIdentifier[0].name", "IntNumber")
-      .formParam("enrolment[1].taxIdentifier[0].value", "IN9001234568")
+      .formParam("enrolment[1].taxIdentifier[0].value", intNumber)
       .formParam("enrolment[1].state", "Activated")
       .check(status.in(200, 303))
       .check(headerRegex("Set-Cookie", """mdtp=(.*)""").saveAs("mdtpCookie"))
@@ -529,6 +529,73 @@ object RegistrationRequests extends ServicesConfiguration {
   def getSuccessfulAmend =
     http("Get Successful Amend page")
       .get(s"$baseUrl$route/successful-amend")
+      .header("Cookie", "mdtp=#{mdtpCookie}")
+      .check(status.in(200))
+
+  def getRejoinJourney =
+    http("Get Rejoin Registration Journey")
+      .get(s"$baseUrl$route/start-rejoin-journey")
+      .check(status.in(303))
+      .check(header("Location").is(s"$route/rejoin-check-your-details"))
+
+  def getRejoinAddTradingName =
+    http("Get Rejoin Add Trading Name page")
+      .get(s"$baseUrl$route/add-other-trading-name?waypoints=rejoin-check-your-details")
+      .header("Cookie", "mdtp=#{mdtpCookie}")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def testRejoinAddTradingName(answer: Boolean) =
+    http("Add Trading Name")
+      .post(s"$baseUrl$route/add-other-trading-name?waypoints=rejoin-check-your-details")
+      .formParam("csrfToken", "#{csrfToken}")
+      .formParam("value", answer)
+      .check(status.in(200, 303))
+
+  def postRejoinAddTradingName(answer: Boolean) =
+    if (answer) {
+      testRejoinAddTradingName(answer)
+        .check(
+          header("Location").is(
+            s"$route/other-trading-name/3?waypoints=add-other-trading-name%2Crejoin-check-your-details"
+          )
+        )
+    } else {
+      testRejoinAddTradingName(answer)
+        .check(header("Location").is(s"$route/rejoin-check-your-details"))
+    }
+
+  def getRejoinTradingName(index: Int) =
+    http("Get Trading Name page")
+      .get(s"$baseUrl$route/other-trading-name/3?waypoints=change-add-other-trading-name%2Crejoin-check-your-details")
+      .header("Cookie", "mdtp=#{mdtpCookie}")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def postRejoinTradingName(index: Int, tradingName: String) =
+    http("Enter Trading Name")
+      .post(s"$baseUrl$route/other-trading-name/3?waypoints=change-add-other-trading-name%2Crejoin-check-your-details")
+      .formParam("csrfToken", "#{csrfToken}")
+      .formParam("value", tradingName)
+      .check(status.in(200, 303))
+      .check(header("Location").is(s"$route/add-other-trading-name?waypoints=rejoin-check-your-details"))
+
+  def getRejoinCheckYourDetails =
+    http("Get Rejoin Check Your Details page")
+      .get(s"$baseUrl$route/rejoin-check-your-details")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def postRejoinCheckYourDetails =
+    http("Post Rejoin Check Your Details page")
+      .post(s"$baseUrl$route/rejoin-check-your-details?incompletePrompt=false")
+      .formParam("csrfToken", "#{csrfToken}")
+      .check(status.in(200, 303))
+      .check(header("Location").is(s"$route/successful-rejoin"))
+
+  def getSuccessfulRejoin =
+    http("Get Successful Rejoin page")
+      .get(s"$baseUrl$route/successful-rejoin")
       .header("Cookie", "mdtp=#{mdtpCookie}")
       .check(status.in(200))
 
