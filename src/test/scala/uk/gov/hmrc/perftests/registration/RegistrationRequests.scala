@@ -78,6 +78,37 @@ object RegistrationRequests extends ServicesConfiguration {
       .check(status.in(200, 303))
       .check(headerRegex("Set-Cookie", """mdtp=(.*)""").saveAs("mdtpCookie"))
 
+  def postAuthorityWizardWithMultipleIntEnrolments(redirectUrl: String) =
+    http("Enter Auth login credentials for multiple Intermediary Numbers")
+      .post(loginUrl + s"/auth-login-stub/gg-sign-in")
+      .formParam("csrfToken", "#{csrfToken}")
+      .formParam("authorityId", "")
+      .formParam("gatewayToken", "")
+      .formParam("credentialStrength", "strong")
+      .formParam("confidenceLevel", "50")
+      .formParam("affinityGroup", "Organisation")
+      .formParam("email", "user@test.com")
+      .formParam("credentialRole", "User")
+      .formParam("redirectionUrl", s"$baseUrl$route/$redirectUrl")
+      .formParam("enrolment[0].name", "HMRC-MTD-VAT")
+      .formParam("enrolment[0].taxIdentifier[0].name", "VRN")
+      .formParam("enrolment[0].taxIdentifier[0].value", "100000001")
+      .formParam("enrolment[0].state", "Activated")
+      .formParam("enrolment[1].name", "HMRC-IOSS-INT")
+      .formParam("enrolment[1].taxIdentifier[0].name", "IntNumber")
+      .formParam("enrolment[1].taxIdentifier[0].value", "IN9009230002")
+      .formParam("enrolment[1].state", "Activated")
+      .formParam("enrolment[2].name", "HMRC-IOSS-INT")
+      .formParam("enrolment[2].taxIdentifier[0].name", "IntNumber")
+      .formParam("enrolment[2].taxIdentifier[0].value", "IN9008230002")
+      .formParam("enrolment[2].state", "Activated")
+      .formParam("enrolment[3].name", "HMRC-IOSS-INT")
+      .formParam("enrolment[3].taxIdentifier[0].name", "IntNumber")
+      .formParam("enrolment[3].taxIdentifier[0].value", "IN9007230002")
+      .formParam("enrolment[3].state", "Activated")
+      .check(status.in(200, 303))
+      .check(headerRegex("Set-Cookie", """mdtp=(.*)""").saveAs("mdtpCookie"))
+
   def getIOSSIntermediaryRegistered =
     http("Get IOSS Intermediary Registered page")
       .get(s"$baseUrl$route/ioss-intermediary-registered")
@@ -598,5 +629,68 @@ object RegistrationRequests extends ServicesConfiguration {
       .get(s"$baseUrl$route/successful-rejoin")
       .header("Cookie", "mdtp=#{mdtpCookie}")
       .check(status.in(200))
+
+  def getChangePreviousRegistrations =
+    http("Get Change Previous Registrations page")
+      .get(s"$baseUrl$route/change-your-previous-registrations?waypoints=change-your-registration")
+      .header("Cookie", "mdtp=#{mdtpCookie}")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def postChangePreviousRegistrations(selection: String) =
+    http("Answer Change Previous Registrations Page")
+      .post(s"$baseUrl$route/change-your-previous-registrations?waypoints=change-your-registration")
+      .formParam("csrfToken", "#{csrfToken}")
+      .formParam("value", selection)
+      .check(status.in(200, 303))
+      .check(header("Location").is(s"$route/start-amend-previous-journey/?waypoints=change-your-registration"))
+
+  def getAmendBusinessContactDetails =
+    http("Get Amend Business Contact Details page")
+      .get(s"$baseUrl$route/contact-details?waypoints=change-a-previous-registration")
+      .header("Cookie", "mdtp=#{mdtpCookie}")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def postAmendBusinessContactDetails(waypoint: String) =
+    http("Enter Amend Business Contact Details")
+      .post(s"$baseUrl$route/contact-details?waypoints=change-a-previous-registration")
+      .formParam("csrfToken", "#{csrfToken}")
+      .formParam("fullName", "Amended Trader Name")
+      .formParam("telephoneNumber", "012301230123")
+      .formParam("emailAddress", "amendedtrader@testemail.com")
+      .check(status.in(200, 303))
+      .check(header("Location").is(s"$route/$waypoint"))
+
+  def getAmendBankDetails =
+    http("Get Amend Bank Details page")
+      .get(s"$baseUrl$route/bank-account-details?waypoints=change-a-previous-registration")
+      .header("Cookie", "mdtp=#{mdtpCookie}")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def postAmendBankDetails(waypoint: String) =
+    http("Enter Amend Bank Details")
+      .post(s"$baseUrl$route/bank-account-details?waypoints=change-a-previous-registration")
+      .formParam("csrfToken", "#{csrfToken}")
+      .formParam("accountName", "Amended trader name")
+      .formParam("bic", "ABCDEF2A")
+      .formParam("iban", "GB33BUKB20201555555555")
+      .check(status.in(200, 303))
+      .check(header("Location").is(s"$route/$waypoint"))
+
+  def getChangeAPreviousRegistration =
+    http("Get Change A Previous Registration page")
+      .get(s"$baseUrl$route/change-a-previous-registration")
+      .header("Cookie", "mdtp=#{mdtpCookie}")
+      .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
+      .check(status.in(200))
+
+  def postChangeAPreviousRegistration =
+    http("Post Change A Previous Registration page")
+      .post(s"$baseUrl$route/change-your-registration?waypoints=change-a-previous-registration&incompletePrompt=false")
+      .formParam("csrfToken", "#{csrfToken}")
+      .check(status.in(200, 303))
+      .check(header("Location").is(s"$route/successful-amend"))
 
 }
