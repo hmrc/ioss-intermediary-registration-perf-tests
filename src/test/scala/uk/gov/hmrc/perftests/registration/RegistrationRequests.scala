@@ -502,6 +502,12 @@ object RegistrationRequests extends ServicesConfiguration {
       .check(status.in(303))
       .check(header("Location").is(s"$route/change-your-registration"))
 
+  def getAmendJourneyForPreviousRegistration =
+    http("Get Amend Registration Journey for Previous Registration")
+      .get(s"$baseUrl$route/start-amend-previous-journey/?waypoints=change-your-registration")
+      .check(status.in(303))
+      .check(header("Location").is(s"$route/change-a-previous-registration"))
+
   def getAmendAddTradingName =
     http("Get Amend Add Trading Name page")
       .get(s"$baseUrl$route/add-other-trading-name?waypoints=change-your-registration")
