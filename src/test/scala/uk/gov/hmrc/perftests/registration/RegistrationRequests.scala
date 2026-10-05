@@ -182,19 +182,19 @@ object RegistrationRequests extends ServicesConfiguration {
       .formParam("csrfToken", "#{csrfToken}")
       .formParam("value", "yes")
       .check(status.in(303))
-      .check(header("Location").is(s"$route/have-other-trading-name"))
+      .check(header("Location").is(s"$route/have-no-other-trading-names"))
 
-  def getHaveOtherTradingName =
-    http("Get Have Other Trading Name page")
-      .get(s"$baseUrl$route/have-other-trading-name")
+  def getIsOnlyTradingName =
+    http("Get Is Only Trading Name page")
+      .get(s"$baseUrl$route/have-no-other-trading-names")
       .check(css(inputSelectorByName("csrfToken"), "value").saveAs("csrfToken"))
       .check(status.in(200))
 
-  def postHaveOtherTradingName =
-    http("Post Have Other Trading Name page")
-      .post(s"$baseUrl$route/have-other-trading-name")
+  def postIsOnlyTradingName =
+    http("Post Is Only Trading Name page")
+      .post(s"$baseUrl$route/have-no-other-trading-names")
       .formParam("csrfToken", "#{csrfToken}")
-      .formParam("value", true)
+      .formParam("value", false)
       .check(status.in(303))
       .check(header("Location").is(s"$route/other-trading-name/1"))
 
